@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: db
+  name: db
+spec:
+  containers:
+  - env:
+    - name: ALLOW_IP_RANGE
+      valueFrom:
+        configMapKeyRef:
+          key: ALLOW_IP_RANGE
+          name: docker-env-db-env
+    - name: POSTGRES_DB
+      valueFrom:
+        configMapKeyRef:
+          key: POSTGRES_DB
+          name: docker-env-db-env
+    - name: POSTGRES_PASS
+      valueFrom:
+        configMapKeyRef:
+          key: POSTGRES_PASS
+          name: docker-env-db-env
+    - name: POSTGRES_USER
+      valueFrom:
+        configMapKeyRef:
+          key: POSTGRES_USER
+          name: docker-env-db-env
+    image: kartoza/postgis:12.0
+    livenessProbe:
+      exec:
+        command:
+        - exit 0
+    name: db
+    ports:
+    - containerPort: 5432
+    resources: {}
+    volumeMounts:
+    - mountPath: /var/lib/postgresql
+      name: geo-db-data
+  restartPolicy: OnFailure
+  volumes:
+  - name: geo-db-data
+    persistentVolumeClaim:
+      claimName: geo-db-data
+status: {}
